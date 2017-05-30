@@ -5,7 +5,7 @@
 <script src="d3.v4.js"></script>
 <script src="d3-cam02@0.1.4.js"></script>
 <style>
-main, aside {
+output {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 100px);
 }
@@ -16,49 +16,41 @@ div {
 </head>
 <body>
 
-<main>
-<div style="background-color: hsl(30, 80%, 50%);"></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div></div>
-<div style="background-color: hsl(180, 80%, 50%)"></div>
-</main>
+<form>
+	<input type="color" id="color1" value="#000000" />
+	<input type="color" id="color2" value="#ffffff" />
+	<input type="number" id="numberOfSteps" value="4" step="1" />
+</form>
 
-<aside>
-<div></div>
-</aside>
+<output>
+</output>
+
 
 <script>
-let divs = document.querySelectorAll('main div');
+let output = document.querySelector('output');
+let inputColor1 = document.querySelector('#color1');
+let inputColor2 = document.querySelector('#color2');
+let inputNumberOfSteps = document.querySelector('#numberOfSteps');
 
+let go = ( function() {
 
-// specify color in jch
-var c = d3.jch(80,20,60)
-divs[0].style.backgroundColor = c + "";
-// if jch is outside of srgb, give box a red border
-if ( (c+"").match("255") ) { divs[0].style.border = "1px solid red"; }
-// make the last box it's perfect compliment
-c.h += 100;
-divs[divs.length-1].style.backgroundColor = c + "";
+	// specify color in jch
 
-x = d3.jab(getComputedStyle(divs[0]).getPropertyValue("background-color"));
-y = d3.jab(getComputedStyle(divs[divs.length - 1]).getPropertyValue("background-color"));
+	x = d3.jab(inputColor1.value);
+	y = d3.jab(inputColor2.value);
 
-i = d3.interpolateJab(x,y);
-j = 0;
-l = divs.length - 1;
+	i = d3.interpolateJab(x,y);
+	l = parseInt(inputNumberOfSteps.value);
 
-for ( div of divs ) {
-div.style.backgroundColor = i(j/l);
-j++;
-}
+	for ( let j = 0; j < ( l + 1 ); j++ ) {
+		let div = document.createElement('div');
+		div.style.backgroundColor = i(j/l);
+		output.appendChild(div);
+	}
 
-z = d3.jch(x);
-z.h += 180;
-document.querySelector('aside div').style.backgroundColor = (z +"");
+} );
 
+go();
 
 </script>
 </body>
