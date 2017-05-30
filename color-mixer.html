@@ -13,6 +13,11 @@ output {
 div {
 	height: 100px;
 }
+input[type=color] {
+	width: 100px;
+	height: 100px;
+}
+
 </style>
 </head>
 <body>
@@ -27,36 +32,36 @@ div {
 <output id="mix">
 </output>
 
-<h2>Compliments</h2>
-<output id="compliments">
+<h2>Arc</h2>
+<output id="arc">
 </output>
 
-<h2>Triads</h2>
-<output id="triads">
+<h2>Reflected Arc</h2>
+<output id="reflectedArc">
 </output>
+
+
 
 <script>
 let outputMix = document.querySelector('#mix');
-let outputCompliments = document.querySelector('#compliments');
-let outputTriads = document.querySelector('#triads');
+let outputArc = document.querySelector('#arc');
+let outputReflectedArc = document.querySelector('#reflectedArc');
 let inputColor1 = document.querySelector('#color1');
 let inputColor2 = document.querySelector('#color2');
 let inputNumberOfSteps = document.querySelector('#numberOfSteps');
 
-let compliment = ( function( color ) {
-	let c = d3.jch(color);
-	c.h += 180;
-	return c;
-} );
-
-let triadFromTwo = ( function( color1, color2 ) {
+let interpolateArc = ( function( color1, color2 ) {
 	let a = d3.jch( color1 );
 	let b = d3.jch( color2 );
-	return d3.jch(
-		( a.J + b.J ) / 2,
-		( a.C + b.C ) / 2,
-		( (a.h + b.h) % 360 ) / 2 + 180
-	);
+	return function( pct ) {
+		pct_a = 1-pct;
+		pct_b = pct;
+		return d3.jch(
+			( a.J * pct_a + b.J * pct_b ),
+			( a.C * pct_a + b.C * pct_b ),
+			( a.h * pct_a + b.h * pct_b )
+		)
+	}
 } );
 
 let go = ( function() {
@@ -65,40 +70,32 @@ let go = ( function() {
 	let y = d3.jab(inputColor2.value);
 
 	let i = d3.interpolateJab(x,y);
+	let a = interpolateArc(x,y);
+
 	let l = parseInt(inputNumberOfSteps.value) - 1;
+
 	outputMix.innerHTML = "";
+	outputArc.innerHTML = "";
+	outputReflectedArc.innerHTML = "";
 
 	for ( let j = 0; j < ( l + 1 ); j++ ) {
 		let div = document.createElement('div');
 		// console.log(j, j/l)
 		div.style.backgroundColor = i(j/l);
 		outputMix.appendChild(div);
+		
+		let arcDiv = document.createElement('div');
+		let arcColor = a(j/l);
+		arcDiv.style.backgroundColor = arcColor;
+		outputArc.appendChild(arcDiv);
+
+		let reflectedArcDiv = document.createElement('div');
+		let reflectedArcColor = d3.jch( arcColor.J, arcColor.C, arcColor.h + 180 );
+		reflectedArcDiv.style.backgroundColor = reflectedArcColor;
+		outputReflectedArc.appendChild(reflectedArcDiv);
+
 	}
 
-	outputCompliments.innerHTML = "";
-	let x_compliment_div = document.createElement('div');
-	x_compliment_div.style.backgroundColor = compliment(x);
-	
-	let y_compliment_div = document.createElement('div');
-	y_compliment_div.style.backgroundColor = compliment(y);
-
-	outputCompliments.appendChild(x_compliment_div);
-	outputCompliments.appendChild(y_compliment_div);
-
-
-	outputTriads.innerHTML = "";
-
-	let triad_opposite_div = document.createElement('div');
-	triad_opposite_div.style.backgroundColor = triadFromTwo(x,y);
-
-	let triad_analog_div = document.createElement('div');
-	let t = triadFromTwo(x,y);
-	t.h += 180
-	triad_analog_div.style.backgroundColor = t;
-	
-
-	outputTriads.appendChild(triad_opposite_div);
-	outputTriads.appendChild(triad_analog_div);
 
 } );
 
