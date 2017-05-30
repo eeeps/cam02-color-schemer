@@ -8,6 +8,7 @@
 output {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 100px);
+	margin-top: 1em;
 }
 div {
 	height: 100px;
@@ -19,35 +20,93 @@ div {
 <form>
 	<input type="color" id="color1" value="#000000" />
 	<input type="color" id="color2" value="#ffffff" />
-	<input type="number" id="numberOfSteps" value="5" step="1" />
+	<input type="number" id="numberOfSteps" value="5" step="1" min="2" />
 </form>
 
-<output>
+<h2>Mix</h2>
+<output id="mix">
 </output>
 
+<h2>Compliments</h2>
+<output id="compliments">
+</output>
+
+<h2>Triads</h2>
+<output id="triads">
+</output>
 
 <script>
-let output = document.querySelector('output');
+let outputMix = document.querySelector('#mix');
+let outputCompliments = document.querySelector('#compliments');
+let outputTriads = document.querySelector('#triads');
 let inputColor1 = document.querySelector('#color1');
 let inputColor2 = document.querySelector('#color2');
 let inputNumberOfSteps = document.querySelector('#numberOfSteps');
 
+let compliment = ( function( color ) {
+	let c = d3.jch(color);
+	c.h += 180;
+	return c;
+} );
+
+let triadFromTwo = ( function( color1, color2 ) {
+	let a = d3.jch( color1 );
+	let b = d3.jch( color2 );
+	return d3.jch(
+		( a.J + b.J ) / 2,
+		( a.C + b.C ) / 2,
+		( (a.h + b.h) % 360 ) / 2 + 180
+	);
+} );
+
 let go = ( function() {
 
-	x = d3.jab(inputColor1.value);
-	y = d3.jab(inputColor2.value);
+	let x = d3.jab(inputColor1.value);
+	let y = d3.jab(inputColor2.value);
 
-	i = d3.interpolateJab(x,y);
-	l = parseInt(inputNumberOfSteps.value) - 1;
+	let i = d3.interpolateJab(x,y);
+	let l = parseInt(inputNumberOfSteps.value) - 1;
+	outputMix.innerHTML = "";
 
 	for ( let j = 0; j < ( l + 1 ); j++ ) {
 		let div = document.createElement('div');
 		// console.log(j, j/l)
 		div.style.backgroundColor = i(j/l);
-		output.appendChild(div);
+		outputMix.appendChild(div);
 	}
 
+	outputCompliments.innerHTML = "";
+	let x_compliment_div = document.createElement('div');
+	x_compliment_div.style.backgroundColor = compliment(x);
+	
+	let y_compliment_div = document.createElement('div');
+	y_compliment_div.style.backgroundColor = compliment(y);
+
+	outputCompliments.appendChild(x_compliment_div);
+	outputCompliments.appendChild(y_compliment_div);
+
+
+	outputTriads.innerHTML = "";
+
+	let triad_opposite_div = document.createElement('div');
+	triad_opposite_div.style.backgroundColor = triadFromTwo(x,y);
+
+	let triad_analog_div = document.createElement('div');
+	let t = triadFromTwo(x,y);
+	t.h += 180
+	triad_analog_div.style.backgroundColor = t;
+	
+
+	outputTriads.appendChild(triad_opposite_div);
+	outputTriads.appendChild(triad_analog_div);
+
 } );
+
+let inputs = document.querySelectorAll('input');
+
+for (input of inputs) {
+	input.addEventListener('change', go);
+}
 
 go();
 
