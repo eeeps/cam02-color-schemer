@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8" />
+<title> </title>
+<script src="d3.v4.js"></script>
+<script src="d3-cam02@0.1.4.js"></script>
+<style>
+main, aside {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 100px);
+}
+div {
+	height: 100px;
+}
+</style>
+</head>
+<body>
+
+<main>
+<div style="background-color: hsl(30, 80%, 50%);"></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div style="background-color: hsl(180, 80%, 50%)"></div>
+</main>
+
+<aside>
+<div></div>
+</aside>
+
+<script>
+let divs = document.querySelectorAll('main div');
+
+
+// specify color in jch
+var c = d3.jch(80,20,60)
+divs[0].style.backgroundColor = c + "";
+// if jch is outside of srgb, give box a red border
+if ( (c+"").match("255") ) { divs[0].style.border = "1px solid red"; }
+// make the last box it's perfect compliment
+c.h += 100;
+divs[divs.length-1].style.backgroundColor = c + "";
+
+x = d3.jab(getComputedStyle(divs[0]).getPropertyValue("background-color"));
+y = d3.jab(getComputedStyle(divs[divs.length - 1]).getPropertyValue("background-color"));
+
+i = d3.interpolateJab(x,y);
+j = 0;
+l = divs.length - 1;
+
+for ( div of divs ) {
+div.style.backgroundColor = i(j/l);
+j++;
+}
+
+z = d3.jch(x);
+z.h += 180;
+document.querySelector('aside div').style.backgroundColor = (z +"");
+
+
+</script>
+</body>
+</html>
