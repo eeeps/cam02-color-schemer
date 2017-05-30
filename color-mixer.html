@@ -19,7 +19,7 @@ div {
 <form>
 	<input type="color" id="color1" value="#000000" />
 	<input type="color" id="color2" value="#ffffff" />
-	<input type="number" id="numberOfSteps" value="4" step="1" />
+	<input type="number" id="numberOfSteps" value="5" step="1" />
 </form>
 
 <output>
@@ -34,16 +34,15 @@ let inputNumberOfSteps = document.querySelector('#numberOfSteps');
 
 let go = ( function() {
 
-	// specify color in jch
-
 	x = d3.jab(inputColor1.value);
 	y = d3.jab(inputColor2.value);
 
 	i = d3.interpolateJab(x,y);
-	l = parseInt(inputNumberOfSteps.value);
+	l = parseInt(inputNumberOfSteps.value) - 1;
 
 	for ( let j = 0; j < ( l + 1 ); j++ ) {
 		let div = document.createElement('div');
+		// console.log(j, j/l)
 		div.style.backgroundColor = i(j/l);
 		output.appendChild(div);
 	}
@@ -51,6 +50,8 @@ let go = ( function() {
 } );
 
 go();
+
+
 
 </script>
 </body>
