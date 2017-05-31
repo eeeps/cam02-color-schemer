@@ -5,17 +5,50 @@
 <script src="d3.v4.js"></script>
 <script src="d3-cam02@0.1.4.js"></script>
 <style>
+
+:root {
+	background-color: #333;
+	color: white;
+	font-family: monospace;
+	font-size: calc(0.5em + 0.5vmin);
+}
+
+h1, h2, h3 {
+	margin-top: 2em;
+}
+
 output {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 100px);
+	grid-template-columns: repeat(auto-fill, 7em);
 	margin-top: 1em;
 }
 div {
-	height: 100px;
+	height: 7em;
+	border: 0.125em solid rgba(100%,100%,100%,0);
+	box-shadow: 0.5em 0.5em 1em rgba(0%,0%,0%,0.5);
 }
+
+.outOfGamut {
+	border-color: red;
+}
+
+.outOfGamut + .outOfGamut {
+	border-left: inherit;
+}
+
 input[type=color] {
-	width: 100px;
-	height: 100px;
+	width: 7em;
+	height: 7em;
+}
+
+input {
+	font-size: inherit;
+}
+
+input[type=number] {
+	width: 2em;
+	font-size: 3em;
+	font-family: inherit;
 }
 
 </style>
@@ -79,19 +112,26 @@ let go = ( function() {
 	outputReflectedArc.innerHTML = "";
 
 	for ( let j = 0; j < ( l + 1 ); j++ ) {
-		let div = document.createElement('div');
+		let mixDiv = document.createElement('div');
 		// console.log(j, j/l)
-		div.style.backgroundColor = i(j/l);
-		outputMix.appendChild(div);
+		mixColor = i(j/l);
+		mixDiv.style.backgroundColor = mixColor;
+		outputMix.appendChild(mixDiv);
 		
 		let arcDiv = document.createElement('div');
 		let arcColor = a(j/l);
 		arcDiv.style.backgroundColor = arcColor;
+		if (arcColor.displayable() === false) {
+			arcDiv.classList.add('outOfGamut');
+		}
 		outputArc.appendChild(arcDiv);
 
 		let reflectedArcDiv = document.createElement('div');
 		let reflectedArcColor = d3.jch( arcColor.J, arcColor.C, arcColor.h + 180 );
 		reflectedArcDiv.style.backgroundColor = reflectedArcColor;
+		if (reflectedArcColor.displayable() === false) {
+			reflectedArcDiv.classList.add('outOfGamut');
+		}
 		outputReflectedArc.appendChild(reflectedArcDiv);
 
 	}
