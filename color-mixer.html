@@ -8,22 +8,34 @@
 
 :root {
 	background-color: #333;
-	color: white;
-	font-family: monospace;
-	font-size: calc(0.5em + 0.5vmin);
+	color: #ccc;
+	/* https://css-tricks.com/snippets/css/system-font-stack/ */
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	font-size: calc(0.5em + 1vmin);
 }
 
-h1, h2, h3 {
-	margin-top: 2em;
+h1, h2, h3, h4, h5, h6 {
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+	font-weight: normal;
 }
+
+h3 {
+	font-variant: all-small-caps;
+	letter-spacing: 0.0625em;
+	font-size: 1em;
+}
+a {
+	color: white;
+}
+
 
 output {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 7em);
-	margin-top: 1em;
+	grid-template-columns: repeat(auto-fill, 6em);
 }
 div {
-	height: 7em;
+	height: 6em;
 	border: 0.125em solid rgba(100%,100%,100%,0);
 	box-shadow: 0.5em 0.5em 1em rgba(0%,0%,0%,0.5);
 }
@@ -37,8 +49,8 @@ div {
 }
 
 input[type=color] {
-	width: 7em;
-	height: 7em;
+	width: 6em;
+	height: 6em;
 }
 
 input {
@@ -47,7 +59,6 @@ input {
 
 input[type=number] {
 	width: 2em;
-	font-size: 3em;
 	font-family: inherit;
 }
 
@@ -56,23 +67,30 @@ input[type=number] {
 <body>
 
 <form>
-	<input type="color" id="color1" value="#000000" />
-	<input type="color" id="color2" value="#ffffff" />
+	<input type="color" id="color1" value="#222222" />
+	<input type="color" id="color2" value="#dddddd" />
 	<input type="number" id="numberOfSteps" value="5" step="1" min="2" />
 </form>
 
-<h2>Mix</h2>
+<h3>Jab Mix</h3>
 <output id="mix">
 </output>
 
-<h2>Arc</h2>
+<h3>JCh Arc</h3>
 <output id="arc">
 </output>
 
-<h2>Reflected Arc</h2>
+<h3>Complimentary Arc</h3>
 <output id="reflectedArc">
 </output>
 
+<h2>What’s this?</h2>
+
+<p>This is a color mixer based on <a href="http://gramaz.io/d3-cam02/">Connor Gramazio’s implementation of the CIECAM02 Jab and JCh color specifications</a>.</p>
+
+<p>Red borders mean the JCh color is outside of the sRGB gamut, and an approximation is being displayed.</p>
+
+<p><a href="http://bl.ocks.org/connorgr/0a299fe77d5c7feccd22e02f2ac5d69b">Here’s a Jab/JCh color picker</a>.</p>
 
 
 <script>
@@ -100,8 +118,8 @@ let interpolateArc = ( function( color1, color2 ) {
 	let hueDelta = shortestAngle( a.h, b.h );
 	
 	return function( pct ) {
-		pct_a = 1-pct;
-		pct_b = pct;
+		let pct_a = 1-pct;
+		let pct_b = pct;
 		return d3.jch(
 			( a.J * pct_a + b.J * pct_b ),
 			( a.C * pct_a + b.C * pct_b ),
@@ -128,12 +146,21 @@ let go = ( function() {
 		let mixDiv = document.createElement('div');
 		// console.log(j, j/l)
 		mixColor = i(j/l);
+		mixColorJab = d3.jab(mixColor);
+		mixDiv.setAttribute( "title",
+			"J: " + Math.round(mixColorJab.J) + "\n" +
+			"a: " + Math.round(mixColorJab.a) + "\n" +
+			"b: " + Math.round(mixColorJab.b) );
 		mixDiv.style.backgroundColor = mixColor;
 		outputMix.appendChild(mixDiv);
 		
 		let arcDiv = document.createElement('div');
 		let arcColor = a(j/l);
 		arcDiv.style.backgroundColor = arcColor;
+		arcDiv.setAttribute( "title",
+			"J: " + Math.round(arcColor.J) + "\n" +
+			"C: " + Math.round(arcColor.C) + "\n" +
+			"h: " + Math.round(arcColor.h) + "°" );
 		if (arcColor.displayable() === false) {
 			arcDiv.classList.add('outOfGamut');
 		}
@@ -142,6 +169,10 @@ let go = ( function() {
 		let reflectedArcDiv = document.createElement('div');
 		let reflectedArcColor = d3.jch( arcColor.J, arcColor.C, arcColor.h + 180 );
 		reflectedArcDiv.style.backgroundColor = reflectedArcColor;
+		reflectedArcDiv.setAttribute( "title",
+			"J: " + Math.round(reflectedArcColor.J) + "\n" +
+			"C: " + Math.round(reflectedArcColor.C) + "\n" +
+			"h: " + Math.round(reflectedArcColor.h) + "°" );
 		if (reflectedArcColor.displayable() === false) {
 			reflectedArcDiv.classList.add('outOfGamut');
 		}
