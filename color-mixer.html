@@ -83,16 +83,29 @@ let inputColor1 = document.querySelector('#color1');
 let inputColor2 = document.querySelector('#color2');
 let inputNumberOfSteps = document.querySelector('#numberOfSteps');
 
+// https://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
+let mod = function(a, b) {
+	return ( a - Math.floor( a / b ) * b );
+}
+let shortestAngle = function( source_angle, target_angle ) {
+	a = target_angle - source_angle;
+	return mod( ( a + 180 ), 360 ) - 180;
+}
+
+
 let interpolateArc = ( function( color1, color2 ) {
 	let a = d3.jch( color1 );
 	let b = d3.jch( color2 );
+	
+	let hueDelta = shortestAngle( a.h, b.h );
+	
 	return function( pct ) {
 		pct_a = 1-pct;
 		pct_b = pct;
 		return d3.jch(
 			( a.J * pct_a + b.J * pct_b ),
 			( a.C * pct_a + b.C * pct_b ),
-			( a.h * pct_a + b.h * pct_b )
+			( a.h + hueDelta * pct_b )
 		)
 	}
 } );
