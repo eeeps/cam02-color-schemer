@@ -144,8 +144,8 @@ let go = ( function() {
 
 	for ( let j = 0; j < ( l + 1 ); j++ ) {
 		let mixDiv = document.createElement('div');
-		// console.log(j, j/l)
-		mixColor = i(j/l);
+		// console.log(j, j/l);
+		mixColor = i(j/l); // returns "rgb()" text, not a jab object, boo
 		mixColorJab = d3.jab(mixColor);
 		mixDiv.setAttribute( "title",
 			"J: " + Math.round(mixColorJab.J) + "\n" +
