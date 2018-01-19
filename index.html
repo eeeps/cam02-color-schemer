@@ -41,12 +41,28 @@ p {
 
 output {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 6em);
+	grid-template-columns: repeat(auto-fill, 7em);
 }
-div {
-	height: 6em;
+.swatch {
+	height: 7em;
 	border: 0.125em solid rgba(100%,100%,100%,0);
 	box-shadow: 0.5em 0.5em 1em rgba(0%,0%,0%,0.5);
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: flex-end;
+}
+
+.color-info {
+	opacity: 0;
+	color: white;
+	letter-spacing: 0.125em;
+	font-size: 0.6em;
+	text-shadow: 0.1em 0.1em 0.4em black;
+	font-weight: 600;
+}
+.swatch:hover .color-info {
+	opacity: 1;
 }
 
 .outOfGamut {
@@ -119,6 +135,20 @@ let shortestAngle = function( source_angle, target_angle ) {
 	return mod( ( a + 180 ), 360 ) - 180;
 }
 
+let leftPad = function( number, length, padder ) {
+	let currentLength = number.toString().length;
+	let difference = length - currentLength;
+	return Array( difference + 1 ).join( padder || '0' ) + number;
+}
+
+let rgbToHex = ( function( rgbString ) {
+	let rgbArray = rgbString.match( /\d+/g ).map( x => parseInt( x ) );
+	let hexString = rgbArray.reduce( ( ( accumulator, x ) => { 
+		channelString = leftPad( x.toString( 16 ), 2 );
+		return accumulator + channelString;
+	} ), "#" );
+	return hexString;
+} );
 
 let interpolateArc = ( function( color1, color2 ) {
 	let a = d3.jch( color1 );
@@ -153,35 +183,50 @@ let go = ( function() {
 
 	for ( let j = 0; j < ( l + 1 ); j++ ) {
 		let mixDiv = document.createElement('div');
+		mixDiv.classList.add( 'swatch' );
 		// console.log(j, j/l);
 		mixColor = i(j/l); // returns "rgb()" text, not a jab object, boo
-		mixColorJab = d3.jab(mixColor);
-		mixDiv.setAttribute( "title",
-			"J: " + Math.round(mixColorJab.J) + "\n" +
-			"a: " + Math.round(mixColorJab.a) + "\n" +
-			"b: " + Math.round(mixColorJab.b) );
 		mixDiv.style.backgroundColor = mixColor;
+		mixColorJab = d3.jab(mixColor);
+		mixDiv.innerHTML = `
+			<div class='color-info'>${ rgbToHex( mixColor ) }</div>
+			<div class='color-info'>
+				J*${ Math.round(mixColorJab.J) }
+				a*${ Math.round(mixColorJab.a) }
+				b*${ Math.round(mixColorJab.b) }
+			</div>
+		`;
 		outputMix.appendChild(mixDiv);
 		
 		let arcDiv = document.createElement('div');
+		arcDiv.classList.add('swatch');
 		let arcColor = a(j/l);
 		arcDiv.style.backgroundColor = arcColor;
-		arcDiv.setAttribute( "title",
-			"J: " + Math.round(arcColor.J) + "\n" +
-			"C: " + Math.round(arcColor.C) + "\n" +
-			"h: " + Math.round(arcColor.h) + "°" );
+		arcDiv.innerHTML = `
+			<div class='color-info'>${ rgbToHex( arcColor.toString() ) }</div>
+			<div class='color-info'>
+				J*${ Math.round(arcColor.J) }
+				c${ Math.round(arcColor.C) }
+				h${ Math.round(arcColor.h) }°
+			</div>
+		`;
 		if (arcColor.displayable() === false) {
 			arcDiv.classList.add('outOfGamut');
 		}
 		outputArc.appendChild(arcDiv);
 
 		let reflectedArcDiv = document.createElement('div');
+		reflectedArcDiv.classList.add('swatch');
 		let reflectedArcColor = d3.jch( arcColor.J, arcColor.C, arcColor.h + 180 );
 		reflectedArcDiv.style.backgroundColor = reflectedArcColor;
-		reflectedArcDiv.setAttribute( "title",
-			"J: " + Math.round(reflectedArcColor.J) + "\n" +
-			"C: " + Math.round(reflectedArcColor.C) + "\n" +
-			"h: " + Math.round(reflectedArcColor.h) + "°" );
+		reflectedArcDiv.innerHTML = `
+			<div class='color-info'>${ rgbToHex( reflectedArcColor.toString() ) }</div>
+			<div class='color-info'>
+				J*${ Math.round(reflectedArcColor.J) }
+				c${ Math.round(reflectedArcColor.C) }
+				h${ Math.round(reflectedArcColor.h) }°
+			</div>
+		`;
 		if (reflectedArcColor.displayable() === false) {
 			reflectedArcDiv.classList.add('outOfGamut');
 		}
