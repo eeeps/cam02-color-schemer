@@ -15,7 +15,7 @@
 }
 
 h1, h2, h3, h4, h5, h6 {
-	margin-top: 1em;
+	margin-top: 1.5em;
 	margin-bottom: 0.5em;
 	font-weight: normal;
 }
@@ -24,11 +24,20 @@ h3 {
 	font-variant: all-small-caps;
 	letter-spacing: 0.0625em;
 	font-size: 1em;
+	display: flex;
+	align-items: center;
 }
+h3 img {
+	margin-right: 0.5em;
+}
+
 a {
 	color: white;
 }
 
+p {
+	max-width: 66ch;
+}
 
 output {
 	display: grid;
@@ -72,21 +81,21 @@ input[type=number] {
 	<input type="number" id="numberOfSteps" value="5" step="1" min="2" />
 </form>
 
-<h3>Jab Mix</h3>
+<h3><img src="https://eric-cloudinary-res.cloudinary.com/image/upload/w_40,q_auto,f_auto/v1516380815/Jab-line.png" /> Jab Blend</h3>
 <output id="mix">
 </output>
 
-<h3>JCh Arc</h3>
+<h3><img src="https://eric-cloudinary-res.cloudinary.com/image/upload/w_40,q_auto,f_auto/v1516380852/JCh-arc.png" /> JCh Arc</h3>
 <output id="arc">
 </output>
 
-<h3>Complimentary Arc</h3>
+<h3><img src="https://eric-cloudinary-res.cloudinary.com/image/upload/w_40,q_auto,f_auto/v1516382271/JCh-complimentary-arc.png" /> Complimentary Arc</h3>
 <output id="reflectedArc">
 </output>
 
 <h2>What’s this?</h2>
 
-<p>This is a color mixer based on <a href="http://gramaz.io/d3-cam02/">Connor Gramazio’s implementation of the CIECAM02 Jab and JCh color specifications</a>.</p>
+<p>This is a color mixer based on <a href="http://gramaz.io/d3-cam02/">Connor Gramazio’s implementation</a> of the CIECAM02 Jab and JCh color specifications.</p>
 
 <p>Red borders mean the JCh color is outside of the sRGB gamut, and an approximation is being displayed.</p>
 
