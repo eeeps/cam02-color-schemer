@@ -56,10 +56,15 @@ output {
 .color-info {
 	opacity: 0;
 	color: white;
-	letter-spacing: 0.125em;
-	font-size: 0.6em;
-	text-shadow: 0.1em 0.1em 0.4em black;
-	font-weight: 600;
+	font-family: menlo, monospace;
+	font-size: 0.75em;
+	font-weight: 400;
+	text-shadow:
+		1px 1px 4px black,
+		0 0 2px black;
+}
+.color-info.hex {
+	font-size: 1em;
 }
 .swatch:hover .color-info {
 	opacity: 1;
@@ -109,7 +114,7 @@ input[type=number] {
 <output id="reflectedArc">
 </output>
 
-<h2>What’s this?</h2>
+<h2>What is this?</h2>
 
 <p>This is a color mixer based on <a href="http://gramaz.io/d3-cam02/">Connor Gramazio’s implementation</a> of the CIECAM02 Jab and JCh color specifications.</p>
 
@@ -189,7 +194,7 @@ let go = ( function() {
 		mixDiv.style.backgroundColor = mixColor;
 		mixColorJab = d3.jab(mixColor);
 		mixDiv.innerHTML = `
-			<div class='color-info'>${ rgbToHex( mixColor ) }</div>
+			<div class='color-info hex'>${ rgbToHex( mixColor ) }</div>
 			<div class='color-info'>
 				J*${ Math.round(mixColorJab.J) }
 				a*${ Math.round(mixColorJab.a) }
@@ -203,7 +208,7 @@ let go = ( function() {
 		let arcColor = a(j/l);
 		arcDiv.style.backgroundColor = arcColor;
 		arcDiv.innerHTML = `
-			<div class='color-info'>${ rgbToHex( arcColor.toString() ) }</div>
+			<div class='color-info hex'>${ rgbToHex( arcColor.toString() ) }</div>
 			<div class='color-info'>
 				J*${ Math.round(arcColor.J) }
 				c${ Math.round(arcColor.C) }
@@ -220,7 +225,7 @@ let go = ( function() {
 		let reflectedArcColor = d3.jch( arcColor.J, arcColor.C, arcColor.h + 180 );
 		reflectedArcDiv.style.backgroundColor = reflectedArcColor;
 		reflectedArcDiv.innerHTML = `
-			<div class='color-info'>${ rgbToHex( reflectedArcColor.toString() ) }</div>
+			<div class='color-info hex'>${ rgbToHex( reflectedArcColor.toString() ) }</div>
 			<div class='color-info'>
 				J*${ Math.round(reflectedArcColor.J) }
 				c${ Math.round(reflectedArcColor.C) }
